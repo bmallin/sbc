@@ -3,6 +3,7 @@
   using System.Linq;
   using Lexing;
   using Lexing.Tokens;
+  using Parsing.AstNodes;
 
 namespace Parsing
 {
@@ -15,9 +16,9 @@ namespace Parsing
             _reader = reader;
         }
 
-        public void BuildAst()
+        public AstNode BuildAst()
         {
-            ParseProgram();
+            return ParseProgram();
         }
 
         private T Match<T>() where T : Token
@@ -39,80 +40,102 @@ namespace Parsing
             return _reader.Read();
         }
 
-        private void ParseProgram()
+        private ProgramNode ParseProgram()
         {
+            return new ProgramNode(ParseLines());
+        }
+
+        private List<LineNode> ParseLines()
+        {
+            var lines = new List<LineNode>();
             while (!_reader.EndOfStream)
             {
-                ParseLines();
+                lines.Add(ParseLine());
             }
+
+            return lines;
         }
 
-        private void ParseLines()
+        private LineNode ParseLine()
         {
-            while (_reader.Peek() is IntegerLiteral)
-            {
-                ParseLine();
-            }
-        }
+            var lineNumber = Match<IntegerLiteral>().AsInt;
+            var statement = ParseStatement();
 
-        private void ParseLine()
-        {
-            Match<IntegerLiteral>();
-            ParseStatement();
             Match<LineTerminator>();
+
+            return new LineNode(lineNumber, statement);
         }
 
-        private void ParseStatement()
+        private StatementNode ParseStatement()
         {
             var statementIdent = Match<Identifier>();
 
             switch (statementIdent.Value.ToLower())
             {
                 case "let":
-                    ParseLetStatement();
-                    break;
-                case "print":
-                    ParsePrintStatement();
-                    break;
+                    return ParseLetStatement();
                 default:
                     throw new Exception($"Unexpected statement: {statementIdent.Value}");
             }
         }
 
-        private void ParseLetStatement()
+        private LetStatementNode ParseLetStatement()
         {
-            Match<Identifier>();
+            var lhs = Match<Identifier>();
             Match<Assign>();
 
-            ParseExpression();
+            var rhs = ParseExpression();
+
+            return new LetStatementNode(lhs, rhs);
         }
 
-        private void ParseExpression()
+        private ExpressionNode ParseExpression()
         {
-            ParseJoin();
+            var lhs = ParseJoin();
+
+            while (_reader.Peek() is Or)
+            {
+                lhs = new OrNode(lhs, ParseJoin());
+            }
+
+            return lhs;
         }
 
-        private void ParseJoin()
+        private ExpressionNode ParseJoin()
         {
-            ParseEquality();
+            var lhs = ParseEquality();
+
+            while (_reader.Peek() is And)
+            {
+                Match<And>();
+                lhs = new AndNode(lhs, ParseEquality());
+            }
+
+            return lhs;
         }
 
-        private void ParseEquality()
+        private ExpressionNode ParseEquality()
         {
-            ParseRel();
+            var lhs = ParseRel();
+
+            while (_reader.Peek() is Equal || _reader.Peek() is NotEqual)
+            {
+                Match(typeof(Equal), typeof(NotEqual));
+                lhs = new 
+            }
         }
 
-        private void ParseRel()
+        private ExpressionNode ParseRel()
         {
-            ParseExpr();
+            return ParseMathExpr();
         }
 
-        private void ParseExpr()
+        private ExpressionNode ParseMathExpr()
         {
-            ParseTerm();
+            return ParseTerm();
         }
 
-        private void ParseTerm()
+        private ExpressionNode ParseTerm()
         {
             ParseUnary();
 
@@ -123,7 +146,7 @@ namespace Parsing
             }
         }
 
-        private void ParseUnary()
+        private ExpressionNode ParseUnary()
         {
             switch (_reader.Peek())
             {
@@ -140,13 +163,13 @@ namespace Parsing
             }
         }
 
-        private void ParseFactor()
+        private ExpressionNode ParseFactor()
         {
             switch (_reader.Peek())
             {
                 case LeftParen t:
                     Match<LeftParen>();
-                    ParseExpression();
+                    return ParseExpression();
                     Match<RightParen>();
                     break;
                 case IntegerLiteral t:
@@ -168,19 +191,6 @@ namespace Parsing
                 default:
                     throw new Exception("Error parsing expression.");
             }            
-        }
-
-        private void ParsePrintStatement()
-        {
-            ParseExpression();
-
-            while (_reader.Peek() is Comma)
-            {
-                Match<Comma>();
-                ParseExpression();
-            }
-
-            Match<LineTerminator>();
         }
     }
 }

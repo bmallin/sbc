@@ -219,9 +219,21 @@ namespace Lexing
 
                     Consume();
                     return CreateToken<LessThanOrEqual>();
+                case '|':
+                    Consume();
+                    if (Peek() == '|')
+                        return CreateToken<Or>();
+                    break;
+                case '&':
+                    Consume();
+                    if (Peek() == '&')
+                        return CreateToken<And>();
+                    break;
                 default:
                     throw new Exception($"Unknown symbol: {Peek()}");
             }
+
+            return null;
         }
 
         private static bool IsSymbol(char c)
