@@ -40,11 +40,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TokenReader.cs" />
     <Compile Include="Tokens\Bang.cs" />
     <Compile Include="Tokens\Caret.cs" />
     <Compile Include="Tokens\Comma.cs" />
     <Compile Include="Tokens\Assign.cs" />
     <Compile Include="Tokens\Equal.cs" />
+    <Compile Include="Tokens\False.cs" />
     <Compile Include="Tokens\GreaterThan.cs" />
     <Compile Include="Tokens\GreaterThanOrEqual.cs" />
     <Compile Include="Tokens\LeftParen.cs" />
@@ -69,6 +71,7 @@
     <Compile Include="Tokens\StringLiteral.cs" />
     <Compile Include="Tokens\Symbol.cs" />
     <Compile Include="Tokens\Token.cs" />
+    <Compile Include="Tokens\True.cs" />
     <Compile Include="Tokens\Unknown.cs" />
     <Compile Include="Tokens\UnknownSymbol.cs" />
   </ItemGroup>

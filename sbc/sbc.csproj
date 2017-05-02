@@ -59,6 +59,10 @@
       <Project>{1e473a64-2c75-4b43-ae11-ce5c488fb6ed}</Project>
       <Name>Lexing</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Parsing\Parsing.csproj">
+      <Project>{2701311d-e755-42ca-a213-645428a2c1b3}</Project>
+      <Name>Parsing</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

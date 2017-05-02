@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using Lexing.Tokens;
 
@@ -9,7 +8,7 @@ namespace Lexing
 {
     public class Lexer
     {
-        private static readonly HashSet<char> _symbols = new HashSet<char>
+        private static readonly HashSet<char> Symbols = new HashSet<char>
         {
             '+',
             '-',
@@ -30,8 +29,6 @@ namespace Lexing
         private readonly StreamReader _reader;
         private readonly StringBuilder _tokenBuffer;
 
-        public char Peek => (char) _reader.Peek();
-
         public Lexer(StreamReader reader)
         {
             _reader = reader;
@@ -43,43 +40,50 @@ namespace Lexing
             var tokens = new List<Token>();
 
             while (!_reader.EndOfStream)
-                if (char.IsDigit(Peek))
+            {
+                if (char.IsDigit(Peek()))
                 {
                     tokens.Add(ReadNumberLiteral());
                 }
-                else if (Peek == '"')
+                else if (Peek() == '"')
                 {
                     tokens.Add(ReadStringLiteral());
                 }
-                else if (char.IsLetter(Peek))
+                else if (char.IsLetter(Peek()))
                 {
                     tokens.Add(ReadIdentifier());
                 }
-                else if (IsSymbol(Peek))
+                else if (IsSymbol(Peek()))
                 {
                     tokens.Add(ReadSymbol());
                 }
-                else if (Peek == '\n')
+                else if (Peek() == '\n')
                 {
                     Consume();
                     tokens.Add(CreateToken<LineTerminator>());
                 }
-                else if (Peek == '#')
+                else if (Peek() == '#')
                 {
                     Skip(c => c != '\n');
                     Skip();
-                    tokens.Remove(tokens.Last());
+                    tokens.RemoveAt(tokens.Count - 1);
                 }
-                else if (char.IsWhiteSpace(Peek))
+                else if (char.IsWhiteSpace(Peek()))
                 {
                     Skip();
                 }
                 else
                 {
-                    throw new Exception("");
+                    throw new Exception($"Unexpected character encountered: {Peek()}");
                 }
+            }
 
             return tokens;
+        }
+
+        private char Peek()
+        {
+            return (char) _reader.Peek();
         }
 
         private void Consume()
@@ -94,13 +98,13 @@ namespace Lexing
 
         private void Skip(Func<char, bool> predicate)
         {
-            while (predicate(Peek))
+            while (predicate(Peek()))
                 _reader.Read();
         }
 
         private void Gobble(Func<char, bool> predicate)
         {
-            while (predicate(Peek))
+            while (predicate(Peek()))
                 Consume();
         }
 
@@ -118,7 +122,7 @@ namespace Lexing
             var isFloat = false;
 
             Gobble(char.IsDigit);
-            if (Peek == '.')
+            if (Peek() == '.')
             {
                 isFloat = true;
                 Gobble(char.IsDigit);
@@ -132,7 +136,7 @@ namespace Lexing
 
         private StringLiteral ReadStringLiteral()
         {
-            if (Peek == '"')
+            if (Peek() == '"')
             {
                 Consume();
                 Gobble(c => c != '"');
@@ -145,7 +149,7 @@ namespace Lexing
 
         private Identifier ReadIdentifier()
         {
-            if (char.IsLetter(Peek))
+            if (char.IsLetter(Peek()))
                 Consume();
 
             Gobble(c => char.IsLetter(c) || char.IsDigit(c) || c == '_');
@@ -155,7 +159,7 @@ namespace Lexing
 
         private Symbol ReadSymbol()
         {
-            switch (Peek)
+            switch (Peek())
             {
                 case '+':
                     Consume();
@@ -186,7 +190,7 @@ namespace Lexing
                     return CreateToken<Comma>();
                 case '!':
                     Consume();
-                    if (Peek != '=')
+                    if (Peek() != '=')
                         return CreateToken<Bang>();
 
                     Consume();
@@ -194,7 +198,7 @@ namespace Lexing
 
                 case '=':
                     Consume();
-                    if (Peek != '=')
+                    if (Peek() != '=')
                         return CreateToken<Assign>();
 
                     Consume();
@@ -202,7 +206,7 @@ namespace Lexing
 
                 case '>':
                     Consume();
-                    if (Peek != '=')
+                    if (Peek() != '=')
                         return CreateToken<GreaterThan>();
 
                     Consume();
@@ -210,19 +214,19 @@ namespace Lexing
 
                 case '<':
                     Consume();
-                    if (Peek != '=')
+                    if (Peek() != '=')
                         return CreateToken<LessThan>();
 
                     Consume();
                     return CreateToken<LessThanOrEqual>();
                 default:
-                    throw new Exception($"Unknown symbol: {Peek}");
+                    throw new Exception($"Unknown symbol: {Peek()}");
             }
         }
 
         private static bool IsSymbol(char c)
         {
-            return _symbols.Contains(c);
+            return Symbols.Contains(c);
         }
     }
 }

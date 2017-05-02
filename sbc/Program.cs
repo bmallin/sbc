@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Lexing;
+using Parsing;
 
 namespace sbc
 {
@@ -10,7 +11,7 @@ namespace sbc
         {
             var filePath = "samples/random.sb";
 
-            using (var file = new StreamReader(File.OpenRead(filePath)))
+            using (var file = new StreamReader(filePath))
             {
                 var lexer = new Lexer(file);
                 var tokens = lexer.GetTokens();
@@ -19,6 +20,11 @@ namespace sbc
                 {
                     Console.WriteLine(token);
                 }
+
+                var reader = new TokenReader(tokens);
+                var parser = new Parser(reader);
+
+                parser.BuildAst();
             }
 
             Console.Write("Press any key to continue...");

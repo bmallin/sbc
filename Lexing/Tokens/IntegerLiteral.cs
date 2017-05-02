@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Lexing.Tokens
+﻿namespace Lexing.Tokens
 {
     public class IntegerLiteral : NumberLiteral
     {
+        public int AsInt => int.Parse(Value);
+
         public IntegerLiteral(string value)
             : base(value)
         {
