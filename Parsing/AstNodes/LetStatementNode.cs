@@ -4,11 +4,11 @@ namespace Parsing.AstNodes
 {
     public class LetStatementNode : StatementNode
     {
-        public Identifier Lhs { get; }
+        public IdentifierNode Lhs { get; }
 
         public ExpressionNode Rhs { get; }
 
-        public LetStatementNode(Identifier lhs, ExpressionNode rhs)
+        public LetStatementNode(IdentifierNode lhs, ExpressionNode rhs)
         {
             Lhs = lhs;
             Rhs = rhs;

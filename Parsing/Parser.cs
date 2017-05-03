@@ -81,9 +81,10 @@ namespace Parsing
 
         private LetStatementNode ParseLetStatement()
         {
-            var lhs = Match<Identifier>();
+            var lhsToken = Match<Identifier>();
             Match<Assign>();
 
+            var lhs = new IdentifierNode(lhsToken);
             var rhs = ParseExpression();
 
             return new LetStatementNode(lhs, rhs);
@@ -120,77 +121,179 @@ namespace Parsing
 
             while (_reader.Peek() is Equal || _reader.Peek() is NotEqual)
             {
-                Match(typeof(Equal), typeof(NotEqual));
-                lhs = new 
+                var token = Match(typeof(Equal), typeof(NotEqual));
+                if (token is Equal)
+                {
+                    lhs = new EqualNode(lhs, ParseRel());
+                }
+                else
+                {
+                    lhs = new NotEqualNode(lhs, ParseRel());
+                }
             }
+
+            return lhs;
         }
 
         private ExpressionNode ParseRel()
         {
-            return ParseMathExpr();
+            var lhs = ParseMathExpr();
+
+            if (_reader.Peek() is LessThan)
+            {
+                Match<LessThan>();
+                lhs = new LessThanNode(lhs, ParseMathExpr());
+            }
+            else if (_reader.Peek() is LessThanOrEqual)
+            {
+                Match<LessThanOrEqual>();
+                lhs = new LessThanOrEqualNode(lhs, ParseMathExpr());
+            }
+            else if (_reader.Peek() is GreaterThan)
+            {
+                Match<GreaterThan>();
+                lhs = new GreaterThanNode(lhs, ParseMathExpr());
+            }
+            else if (_reader.Peek() is GreaterThanOrEqual)
+            {
+                Match<GreaterThanOrEqual>();
+                lhs = new GreaterThanNodeOrEqual(lhs, ParseMathExpr());
+            }
+
+            return lhs;
         }
 
         private ExpressionNode ParseMathExpr()
         {
-            return ParseTerm();
+            var lhs = ParseTerm();
+
+            while (true)
+            {
+                if (_reader.Peek() is Plus)
+                {
+                    Match<Plus>();
+                    lhs = new AdditionNode(lhs, ParseTerm());
+                }
+                else if (_reader.Peek() is Dash)
+                {
+                    Match<Dash>();
+                    lhs = new SubtractionNode(lhs, ParseTerm());
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return lhs;
         }
 
         private ExpressionNode ParseTerm()
         {
-            ParseUnary();
+            var lhs = ParseUnary();
 
-            while (_reader.Peek() is Slash || _reader.Peek() is Asterisk)
+            while (true)
             {
-                Match(typeof(Slash), typeof(Asterisk));
-
+                if (_reader.Peek() is Asterisk)
+                {
+                    Match<Asterisk>();
+                    lhs = new MultiplicationNode(lhs, ParseUnary());
+                }
+                else if (_reader.Peek() is Slash)
+                {
+                    Match<Slash>();
+                    lhs = new DivisionNode(lhs, ParseUnary());
+                }
+                else if (_reader.Peek() is Percent)
+                {
+                    Match<Percent>();
+                    lhs = new ModNode(lhs, ParseUnary());
+                }
+                else
+                {
+                    break;
+                }
             }
+
+            return lhs;
         }
 
         private ExpressionNode ParseUnary()
         {
-            switch (_reader.Peek())
+            if (_reader.Peek() is Dash)
             {
-                case Dash t:
-                    Match<Dash>();
-                    break;
-                case Bang t:
-                    Match<Bang>();
-                    break;
-                default:
-                    ParseFactor();
-                    break;
-
+                Match<Dash>();
+                return new UnaryNegate(ParseUnary());
             }
+            if (_reader.Peek() is Bang)
+            {
+                Match<Bang>();
+                return new UnaryLogicalNegate(ParseUnary());
+            }
+            if (_reader.Peek() is Plus)
+            {
+                Match<Plus>();
+                // we don't actually need to do anything else here.
+            }
+
+            return ParseFactor();
         }
 
         private ExpressionNode ParseFactor()
         {
-            switch (_reader.Peek())
+            ExpressionNode x;
+            if (_reader.Peek() is LeftParen)
             {
-                case LeftParen t:
-                    Match<LeftParen>();
-                    return ParseExpression();
-                    Match<RightParen>();
-                    break;
-                case IntegerLiteral t:
-                    Match<IntegerLiteral>();
-                    break;
-                case FloatLiteral t:
-                    Match<FloatLiteral>();
-                    break;
-                case True t:
-                    Match<True>();
-                    break;
-                case False t:
-                    Match<False>();
-                    break;
-                case Identifier t:
-                    Match<Identifier>();
-                    // lookup in symtable
-                    break;
-                default:
-                    throw new Exception("Error parsing expression.");
-            }            
+                Match<LeftParen>();
+                x = ParseExpression();
+                Match<RightParen>();
+
+                return x;
+            }
+
+            if (_reader.Peek() is IntegerLiteral)
+            {
+                var token = Match<IntegerLiteral>();
+                x = new IntegerConstant(token.Value);
+                return x;
+            }
+
+            if (_reader.Peek() is FloatLiteral)
+            {
+                var token = Match<FloatLiteral>();
+                x = new FloatConstant(token.Value);
+                return x;
+            }
+
+            if (_reader.Peek() is StringLiteral)
+            {
+                var token = Match<StringLiteral>();
+                x = new StringConstant(token.Value);
+                return x;
+            }
+
+            if (_reader.Peek() is True)
+            {
+                Match<True>();
+                x = BoolConstant.True;
+                return x;
+            }
+
+            if (_reader.Peek() is False)
+            {
+                Match<False>();
+                x = BoolConstant.False;
+                return x;
+            }
+
+            if (_reader.Peek() is Identifier)
+            {
+                var token = Match<Identifier>();
+                x = new IdentifierNode(token);
+                return x;
+            }
+
+            throw new Exception("syntax error");
         }
     }
 }

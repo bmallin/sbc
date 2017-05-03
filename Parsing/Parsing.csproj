@@ -40,15 +40,34 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AstNodes\AdditionNode.cs" />
     <Compile Include="AstNodes\AndNode.cs" />
     <Compile Include="AstNodes\AstNode.cs" />
     <Compile Include="AstNodes\BinaryOperatorNode.cs" />
+    <Compile Include="AstNodes\BoolConstant.cs" />
+    <Compile Include="AstNodes\Constant.cs" />
+    <Compile Include="AstNodes\DivisionNode.cs" />
+    <Compile Include="AstNodes\EqualityNode.cs" />
     <Compile Include="AstNodes\ExpressionNode.cs" />
+    <Compile Include="AstNodes\FloatConstant.cs" />
+    <Compile Include="AstNodes\GreaterThanNode.cs" />
+    <Compile Include="AstNodes\GreaterThanOrEqualNode.cs" />
+    <Compile Include="AstNodes\IdentifierNode.cs" />
+    <Compile Include="AstNodes\IntegerConstant.cs" />
+    <Compile Include="AstNodes\LessThanNode.cs" />
+    <Compile Include="AstNodes\LessThanOrEqualNode.cs" />
     <Compile Include="AstNodes\LetStatementNode.cs" />
     <Compile Include="AstNodes\LineNode.cs" />
+    <Compile Include="AstNodes\ModNode.cs" />
+    <Compile Include="AstNodes\MultiplicationNode.cs" />
+    <Compile Include="AstNodes\NotEqualNode.cs" />
     <Compile Include="AstNodes\OrNode.cs" />
     <Compile Include="AstNodes\ProgramNode.cs" />
     <Compile Include="AstNodes\StatementNode.cs" />
+    <Compile Include="AstNodes\StringConstant.cs" />
+    <Compile Include="AstNodes\SubtractionNode.cs" />
+    <Compile Include="AstNodes\UnaryLogicalNegate.cs" />
+    <Compile Include="AstNodes\UnaryNegate.cs" />
     <Compile Include="ExpressionParser.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
