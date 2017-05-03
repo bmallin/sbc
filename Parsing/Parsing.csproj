@@ -40,6 +40,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AstNodes\AndNode.cs" />
+    <Compile Include="AstNodes\AstNode.cs" />
+    <Compile Include="AstNodes\BinaryOperatorNode.cs" />
+    <Compile Include="AstNodes\ExpressionNode.cs" />
+    <Compile Include="AstNodes\LetStatementNode.cs" />
+    <Compile Include="AstNodes\LineNode.cs" />
+    <Compile Include="AstNodes\OrNode.cs" />
+    <Compile Include="AstNodes\ProgramNode.cs" />
+    <Compile Include="AstNodes\StatementNode.cs" />
     <Compile Include="ExpressionParser.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

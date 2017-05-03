@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TokenReader.cs" />
+    <Compile Include="Tokens\And.cs" />
     <Compile Include="Tokens\Bang.cs" />
     <Compile Include="Tokens\Caret.cs" />
     <Compile Include="Tokens\Comma.cs" />
@@ -55,6 +56,7 @@
     <Compile Include="Tokens\LineTerminator.cs" />
     <Compile Include="Tokens\NotEqual.cs" />
     <Compile Include="Tokens\Octothorpe.cs" />
+    <Compile Include="Tokens\Or.cs" />
     <Compile Include="Tokens\Percent.cs" />
     <Compile Include="Lexer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
