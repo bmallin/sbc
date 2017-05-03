@@ -47,6 +47,7 @@
     <Compile Include="AstNodes\BoolConstant.cs" />
     <Compile Include="AstNodes\Constant.cs" />
     <Compile Include="AstNodes\DivisionNode.cs" />
+    <Compile Include="AstNodes\EndStatementNode.cs" />
     <Compile Include="AstNodes\EqualityNode.cs" />
     <Compile Include="AstNodes\ExpressionNode.cs" />
     <Compile Include="AstNodes\FloatConstant.cs" />
@@ -62,6 +63,7 @@
     <Compile Include="AstNodes\MultiplicationNode.cs" />
     <Compile Include="AstNodes\NotEqualNode.cs" />
     <Compile Include="AstNodes\OrNode.cs" />
+    <Compile Include="AstNodes\PrintStatementNode.cs" />
     <Compile Include="AstNodes\ProgramNode.cs" />
     <Compile Include="AstNodes\StatementNode.cs" />
     <Compile Include="AstNodes\StringConstant.cs" />

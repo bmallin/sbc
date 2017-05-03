@@ -138,11 +138,11 @@ namespace Lexing
         {
             if (Peek() == '"')
             {
-                Consume();
+                Skip();
                 Gobble(c => c != '"');
             }
 
-            Consume();
+            Skip();
 
             return CreateToken<StringLiteral>();
         }

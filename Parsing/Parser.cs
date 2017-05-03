@@ -61,7 +61,15 @@ namespace Parsing
             var lineNumber = Match<IntegerLiteral>().AsInt;
             var statement = ParseStatement();
 
-            Match<LineTerminator>();
+            if (statement is EndStatementNode)
+            {
+                if (_reader.Peek() is LineTerminator)
+                    Match<LineTerminator>();
+            }
+            else
+            {
+                Match<LineTerminator>();
+            }
 
             return new LineNode(lineNumber, statement);
         }
@@ -74,6 +82,10 @@ namespace Parsing
             {
                 case "let":
                     return ParseLetStatement();
+                case "print":
+                    return ParsePrintStatement();
+                case "end":
+                    return new EndStatementNode();
                 default:
                     throw new Exception($"Unexpected statement: {statementIdent.Value}");
             }
@@ -88,6 +100,19 @@ namespace Parsing
             var rhs = ParseExpression();
 
             return new LetStatementNode(lhs, rhs);
+        }
+
+        private PrintStatementNode ParsePrintStatement()
+        {
+            var expressions = new List<ExpressionNode> {ParseExpression()};
+
+            while (_reader.Peek() is Comma)
+            {
+                Match<Comma>();
+                expressions.Add(ParseExpression());
+            }
+
+            return new PrintStatementNode(expressions);
         }
 
         private ExpressionNode ParseExpression()
