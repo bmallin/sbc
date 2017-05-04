@@ -46,7 +46,7 @@ namespace Parsing
         }
 
         private List<LineNode> ParseLines()
-        {
+       {
             var lines = new List<LineNode>();
             while (!_reader.EndOfStream)
             {
@@ -57,7 +57,7 @@ namespace Parsing
         }
 
         private LineNode ParseLine()
-        {
+       {
             var lineNumber = Match<IntegerLiteral>().AsInt;
             var statement = ParseStatement();
 
@@ -84,6 +84,14 @@ namespace Parsing
                     return ParseLetStatement();
                 case "print":
                     return ParsePrintStatement();
+                case "if":
+                    return ParseIfThenStatement();
+                case "goto":
+                    return ParseGotoStatement();
+                case "gosub":
+                    return ParseGoSubStatement();
+                case "return":
+                    return new ReturnStatementNode();
                 case "end":
                     return new EndStatementNode();
                 default:
@@ -115,6 +123,34 @@ namespace Parsing
             return new PrintStatementNode(expressions);
         }
 
+        private IfThenStatemmentNode ParseIfThenStatement()
+        {
+            var predicate = ParseExpression();
+
+            if (Match<Identifier>().Value.ToLower() != "then")
+            {
+                throw new Exception("Syntax error");
+            }
+
+            var statement = ParseStatement();
+
+            return new IfThenStatemmentNode(predicate, statement);
+        }
+
+        private GotoStatementNode ParseGotoStatement()
+        {
+            var jumpLocation = ParseExpression();
+
+            return new GotoStatementNode(jumpLocation);
+        }
+
+        private GoSubStatementNode ParseGoSubStatement()
+        {
+            var jumpLocation = ParseExpression();
+
+            return new GoSubStatementNode(jumpLocation);
+        }
+
         private ExpressionNode ParseExpression()
         {
             var lhs = ParseJoin();
@@ -144,16 +180,21 @@ namespace Parsing
         {
             var lhs = ParseRel();
 
-            while (_reader.Peek() is Equal || _reader.Peek() is NotEqual)
+            while (true)
             {
-                var token = Match(typeof(Equal), typeof(NotEqual));
-                if (token is Equal)
+                if (_reader.Peek() is Equal)
                 {
+                    Match<Equal>();
                     lhs = new EqualNode(lhs, ParseRel());
+                }
+                else if (_reader.Peek() is NotEqual)
+                {
+                    Match<NotEqual>();
+                    lhs = new NotEqualNode(lhs, ParseRel());
                 }
                 else
                 {
-                    lhs = new NotEqualNode(lhs, ParseRel());
+                    break;
                 }
             }
 

@@ -9,7 +9,7 @@ namespace sbc
     {
         public static void Main(string[] args)
         {
-            const string filePath = "samples/helloworld.sb";
+            const string filePath = "samples/random.sb";
 
             using (var file = new StreamReader(filePath))
             {

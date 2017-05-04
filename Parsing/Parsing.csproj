@@ -51,9 +51,12 @@
     <Compile Include="AstNodes\EqualityNode.cs" />
     <Compile Include="AstNodes\ExpressionNode.cs" />
     <Compile Include="AstNodes\FloatConstant.cs" />
+    <Compile Include="AstNodes\GoSubStatementNode.cs" />
+    <Compile Include="AstNodes\GotoStatementNode.cs" />
     <Compile Include="AstNodes\GreaterThanNode.cs" />
     <Compile Include="AstNodes\GreaterThanOrEqualNode.cs" />
     <Compile Include="AstNodes\IdentifierNode.cs" />
+    <Compile Include="AstNodes\IfThenStatemmentNode.cs" />
     <Compile Include="AstNodes\IntegerConstant.cs" />
     <Compile Include="AstNodes\LessThanNode.cs" />
     <Compile Include="AstNodes\LessThanOrEqualNode.cs" />
@@ -65,6 +68,7 @@
     <Compile Include="AstNodes\OrNode.cs" />
     <Compile Include="AstNodes\PrintStatementNode.cs" />
     <Compile Include="AstNodes\ProgramNode.cs" />
+    <Compile Include="AstNodes\ReturnStatementNode.cs" />
     <Compile Include="AstNodes\StatementNode.cs" />
     <Compile Include="AstNodes\StringConstant.cs" />
     <Compile Include="AstNodes\SubtractionNode.cs" />
