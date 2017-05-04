@@ -2,7 +2,7 @@
 {
     public class NotEqualNode : BinaryOperatorNode
     {
-        public NotEqualNode(ExpressionNode lhs, ExpressionNode rhs) 
+        public NotEqualNode(ExpressionNode lhs, ExpressionNode rhs)
             : base(lhs, rhs)
         {
         }

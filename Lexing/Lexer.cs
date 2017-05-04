@@ -81,31 +81,14 @@ namespace Lexing
             return tokens;
         }
 
-        private char Peek()
+        private static bool IsSymbol(char c)
         {
-            return (char) _reader.Peek();
+            return Symbols.Contains(c);
         }
 
         private void Consume()
         {
             _tokenBuffer.Append((char) _reader.Read());
-        }
-
-        private void Skip()
-        {
-            _reader.Read();
-        }
-
-        private void Skip(Func<char, bool> predicate)
-        {
-            while (predicate(Peek()))
-                _reader.Read();
-        }
-
-        private void Gobble(Func<char, bool> predicate)
-        {
-            while (predicate(Peek()))
-                Consume();
         }
 
         private T CreateToken<T>() where T : Token
@@ -115,6 +98,29 @@ namespace Lexing
             _tokenBuffer.Clear();
 
             return (T) Activator.CreateInstance(typeof(T), value);
+        }
+
+        private void Gobble(Func<char, bool> predicate)
+        {
+            while (predicate(Peek()))
+            {
+                Consume();
+            }
+        }
+
+        private char Peek()
+        {
+            return (char) _reader.Peek();
+        }
+
+        private Identifier ReadIdentifier()
+        {
+            if (char.IsLetter(Peek()))
+                Consume();
+
+            Gobble(c => char.IsLetter(c) || char.IsDigit(c) || c == '_');
+
+            return CreateToken<Identifier>();
         }
 
         private NumberLiteral ReadNumberLiteral()
@@ -147,16 +153,7 @@ namespace Lexing
             return CreateToken<StringLiteral>();
         }
 
-        private Identifier ReadIdentifier()
-        {
-            if (char.IsLetter(Peek()))
-                Consume();
-
-            Gobble(c => char.IsLetter(c) || char.IsDigit(c) || c == '_');
-
-            return CreateToken<Identifier>();
-        }
-
+        // ReSharper disable once CyclomaticComplexity
         private Symbol ReadSymbol()
         {
             switch (Peek())
@@ -236,9 +233,17 @@ namespace Lexing
             return null;
         }
 
-        private static bool IsSymbol(char c)
+        private void Skip()
         {
-            return Symbols.Contains(c);
+            _reader.Read();
+        }
+
+        private void Skip(Func<char, bool> predicate)
+        {
+            while (predicate(Peek()))
+            {
+                _reader.Read();
+            }
         }
     }
 }

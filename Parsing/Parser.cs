@@ -1,9 +1,9 @@
-﻿  using System;
-  using System.Collections.Generic;
-  using System.Linq;
-  using Lexing;
-  using Lexing.Tokens;
-  using Parsing.AstNodes;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Lexing;
+using Lexing.Tokens;
+using Parsing.AstNodes;
 
 namespace Parsing
 {
@@ -40,142 +40,6 @@ namespace Parsing
             return _reader.Read();
         }
 
-        private ProgramNode ParseProgram()
-        {
-            return new ProgramNode(ParseLines());
-        }
-
-        private List<LineNode> ParseLines()
-       {
-            var lines = new List<LineNode>();
-            while (!_reader.EndOfStream)
-            {
-                lines.Add(ParseLine());
-            }
-
-            return lines;
-        }
-
-        private LineNode ParseLine()
-       {
-            var lineNumber = Match<IntegerLiteral>().AsInt;
-            var statement = ParseStatement();
-
-            if (statement is EndStatementNode)
-            {
-                if (_reader.Peek() is LineTerminator)
-                    Match<LineTerminator>();
-            }
-            else
-            {
-                Match<LineTerminator>();
-            }
-
-            return new LineNode(lineNumber, statement);
-        }
-
-        private StatementNode ParseStatement()
-        {
-            var statementIdent = Match<Identifier>();
-
-            switch (statementIdent.Value.ToLower())
-            {
-                case "let":
-                    return ParseLetStatement();
-                case "print":
-                    return ParsePrintStatement();
-                case "if":
-                    return ParseIfThenStatement();
-                case "goto":
-                    return ParseGotoStatement();
-                case "gosub":
-                    return ParseGoSubStatement();
-                case "return":
-                    return new ReturnStatementNode();
-                case "end":
-                    return new EndStatementNode();
-                default:
-                    throw new Exception($"Unexpected statement: {statementIdent.Value}");
-            }
-        }
-
-        private LetStatementNode ParseLetStatement()
-        {
-            var lhsToken = Match<Identifier>();
-            Match<Assign>();
-
-            var lhs = new IdentifierNode(lhsToken);
-            var rhs = ParseExpression();
-
-            return new LetStatementNode(lhs, rhs);
-        }
-
-        private PrintStatementNode ParsePrintStatement()
-        {
-            var expressions = new List<ExpressionNode> {ParseExpression()};
-
-            while (_reader.Peek() is Comma)
-            {
-                Match<Comma>();
-                expressions.Add(ParseExpression());
-            }
-
-            return new PrintStatementNode(expressions);
-        }
-
-        private IfThenStatemmentNode ParseIfThenStatement()
-        {
-            var predicate = ParseExpression();
-
-            if (Match<Identifier>().Value.ToLower() != "then")
-            {
-                throw new Exception("Syntax error");
-            }
-
-            var statement = ParseStatement();
-
-            return new IfThenStatemmentNode(predicate, statement);
-        }
-
-        private GotoStatementNode ParseGotoStatement()
-        {
-            var jumpLocation = ParseExpression();
-
-            return new GotoStatementNode(jumpLocation);
-        }
-
-        private GoSubStatementNode ParseGoSubStatement()
-        {
-            var jumpLocation = ParseExpression();
-
-            return new GoSubStatementNode(jumpLocation);
-        }
-
-        private ExpressionNode ParseExpression()
-        {
-            var lhs = ParseJoin();
-
-            while (_reader.Peek() is Or)
-            {
-                lhs = new OrNode(lhs, ParseJoin());
-            }
-
-            return lhs;
-        }
-
-        private ExpressionNode ParseJoin()
-        {
-            var lhs = ParseEquality();
-
-            while (_reader.Peek() is And)
-            {
-                Match<And>();
-                lhs = new AndNode(lhs, ParseEquality());
-            }
-
-            return lhs;
-        }
-
         private ExpressionNode ParseEquality()
         {
             var lhs = ParseRel();
@@ -201,108 +65,16 @@ namespace Parsing
             return lhs;
         }
 
-        private ExpressionNode ParseRel()
+        private ExpressionNode ParseExpression()
         {
-            var lhs = ParseMathExpr();
+            var lhs = ParseJoin();
 
-            if (_reader.Peek() is LessThan)
+            while (_reader.Peek() is Or)
             {
-                Match<LessThan>();
-                lhs = new LessThanNode(lhs, ParseMathExpr());
-            }
-            else if (_reader.Peek() is LessThanOrEqual)
-            {
-                Match<LessThanOrEqual>();
-                lhs = new LessThanOrEqualNode(lhs, ParseMathExpr());
-            }
-            else if (_reader.Peek() is GreaterThan)
-            {
-                Match<GreaterThan>();
-                lhs = new GreaterThanNode(lhs, ParseMathExpr());
-            }
-            else if (_reader.Peek() is GreaterThanOrEqual)
-            {
-                Match<GreaterThanOrEqual>();
-                lhs = new GreaterThanNodeOrEqual(lhs, ParseMathExpr());
+                lhs = new OrNode(lhs, ParseJoin());
             }
 
             return lhs;
-        }
-
-        private ExpressionNode ParseMathExpr()
-        {
-            var lhs = ParseTerm();
-
-            while (true)
-            {
-                if (_reader.Peek() is Plus)
-                {
-                    Match<Plus>();
-                    lhs = new AdditionNode(lhs, ParseTerm());
-                }
-                else if (_reader.Peek() is Dash)
-                {
-                    Match<Dash>();
-                    lhs = new SubtractionNode(lhs, ParseTerm());
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            return lhs;
-        }
-
-        private ExpressionNode ParseTerm()
-        {
-            var lhs = ParseUnary();
-
-            while (true)
-            {
-                if (_reader.Peek() is Asterisk)
-                {
-                    Match<Asterisk>();
-                    lhs = new MultiplicationNode(lhs, ParseUnary());
-                }
-                else if (_reader.Peek() is Slash)
-                {
-                    Match<Slash>();
-                    lhs = new DivisionNode(lhs, ParseUnary());
-                }
-                else if (_reader.Peek() is Percent)
-                {
-                    Match<Percent>();
-                    lhs = new ModNode(lhs, ParseUnary());
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            return lhs;
-        }
-
-        private ExpressionNode ParseUnary()
-        {
-            if (_reader.Peek() is Dash)
-            {
-                Match<Dash>();
-                return new UnaryNegate(ParseUnary());
-            }
-            if (_reader.Peek() is Bang)
-            {
-                Match<Bang>();
-                return new UnaryLogicalNegate(ParseUnary());
-            }
-            if (_reader.Peek() is Plus)
-            {
-                Match<Plus>();
-                // we don't actually need to do anything else here.
-            }
-
-            return ParseFactor();
         }
 
         private ExpressionNode ParseFactor()
@@ -360,6 +132,229 @@ namespace Parsing
             }
 
             throw new Exception("syntax error");
+        }
+
+        private GoSubStatementNode ParseGoSubStatement()
+        {
+            var jumpLocation = ParseExpression();
+
+            return new GoSubStatementNode(jumpLocation);
+        }
+
+        private GotoStatementNode ParseGotoStatement()
+        {
+            var jumpLocation = ParseExpression();
+
+            return new GotoStatementNode(jumpLocation);
+        }
+
+        private IfThenStatemmentNode ParseIfThenStatement()
+        {
+            var predicate = ParseExpression();
+
+            if (Match<Identifier>().Value.ToLower() != "then")
+                throw new Exception("Syntax error");
+
+            var statement = ParseStatement();
+
+            return new IfThenStatemmentNode(predicate, statement);
+        }
+
+        private ExpressionNode ParseJoin()
+        {
+            var lhs = ParseEquality();
+
+            while (_reader.Peek() is And)
+            {
+                Match<And>();
+                lhs = new AndNode(lhs, ParseEquality());
+            }
+
+            return lhs;
+        }
+
+        private LetStatementNode ParseLetStatement()
+        {
+            var lhsToken = Match<Identifier>();
+            Match<Assign>();
+
+            var lhs = new IdentifierNode(lhsToken);
+            var rhs = ParseExpression();
+
+            return new LetStatementNode(lhs, rhs);
+        }
+
+        private LineNode ParseLine()
+        {
+            var lineNumber = Match<IntegerLiteral>().AsInt;
+            var statement = ParseStatement();
+
+            if (statement is EndStatementNode)
+            {
+                if (_reader.Peek() is LineTerminator)
+                    Match<LineTerminator>();
+            }
+            else
+            {
+                Match<LineTerminator>();
+            }
+
+            return new LineNode(lineNumber, statement);
+        }
+
+        private List<LineNode> ParseLines()
+        {
+            var lines = new List<LineNode>();
+            while (!_reader.EndOfStream)
+            {
+                lines.Add(ParseLine());
+            }
+
+            return lines;
+        }
+
+        private ExpressionNode ParseMathExpr()
+        {
+            var lhs = ParseTerm();
+
+            while (true)
+            {
+                if (_reader.Peek() is Plus)
+                {
+                    Match<Plus>();
+                    lhs = new AdditionNode(lhs, ParseTerm());
+                }
+                else if (_reader.Peek() is Dash)
+                {
+                    Match<Dash>();
+                    lhs = new SubtractionNode(lhs, ParseTerm());
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return lhs;
+        }
+
+        private PrintStatementNode ParsePrintStatement()
+        {
+            var expressions = new List<ExpressionNode> {ParseExpression()};
+
+            while (_reader.Peek() is Comma)
+            {
+                Match<Comma>();
+                expressions.Add(ParseExpression());
+            }
+
+            return new PrintStatementNode(expressions);
+        }
+
+        private ProgramNode ParseProgram()
+        {
+            return new ProgramNode(ParseLines());
+        }
+
+        private ExpressionNode ParseRel()
+        {
+            var lhs = ParseMathExpr();
+
+            if (_reader.Peek() is LessThan)
+            {
+                Match<LessThan>();
+                lhs = new LessThanNode(lhs, ParseMathExpr());
+            }
+            else if (_reader.Peek() is LessThanOrEqual)
+            {
+                Match<LessThanOrEqual>();
+                lhs = new LessThanOrEqualNode(lhs, ParseMathExpr());
+            }
+            else if (_reader.Peek() is GreaterThan)
+            {
+                Match<GreaterThan>();
+                lhs = new GreaterThanNode(lhs, ParseMathExpr());
+            }
+            else if (_reader.Peek() is GreaterThanOrEqual)
+            {
+                Match<GreaterThanOrEqual>();
+                lhs = new GreaterThanNodeOrEqual(lhs, ParseMathExpr());
+            }
+
+            return lhs;
+        }
+
+        private StatementNode ParseStatement()
+        {
+            var statementIdent = Match<Identifier>();
+
+            switch (statementIdent.Value.ToLower())
+            {
+                case "let":
+                    return ParseLetStatement();
+                case "print":
+                    return ParsePrintStatement();
+                case "if":
+                    return ParseIfThenStatement();
+                case "goto":
+                    return ParseGotoStatement();
+                case "gosub":
+                    return ParseGoSubStatement();
+                case "return":
+                    return new ReturnStatementNode();
+                case "end":
+                    return new EndStatementNode();
+                default:
+                    throw new Exception($"Unexpected statement: {statementIdent.Value}");
+            }
+        }
+
+        private ExpressionNode ParseTerm()
+        {
+            var lhs = ParseUnary();
+
+            while (true)
+            {
+                if (_reader.Peek() is Asterisk)
+                {
+                    Match<Asterisk>();
+                    lhs = new MultiplicationNode(lhs, ParseUnary());
+                }
+                else if (_reader.Peek() is Slash)
+                {
+                    Match<Slash>();
+                    lhs = new DivisionNode(lhs, ParseUnary());
+                }
+                else if (_reader.Peek() is Percent)
+                {
+                    Match<Percent>();
+                    lhs = new ModNode(lhs, ParseUnary());
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return lhs;
+        }
+
+        private ExpressionNode ParseUnary()
+        {
+            if (_reader.Peek() is Dash)
+            {
+                Match<Dash>();
+                return new UnaryNegate(ParseUnary());
+            }
+            if (_reader.Peek() is Bang)
+            {
+                Match<Bang>();
+                return new UnaryLogicalNegate(ParseUnary());
+            }
+            if (_reader.Peek() is Plus)
+                Match<Plus>();
+
+            return ParseFactor();
         }
     }
 }

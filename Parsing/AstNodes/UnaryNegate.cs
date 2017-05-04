@@ -2,11 +2,11 @@
 {
     public class UnaryNegate : ExpressionNode
     {
-        public ExpressionNode ToNegate { get; }
-
         public UnaryNegate(ExpressionNode toNegate)
         {
             ToNegate = toNegate;
         }
+
+        public ExpressionNode ToNegate { get; }
     }
 }

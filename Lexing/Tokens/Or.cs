@@ -2,7 +2,7 @@
 {
     public class Or : Symbol
     {
-        public Or(string value) 
+        public Or(string value)
             : base("||")
         {
         }

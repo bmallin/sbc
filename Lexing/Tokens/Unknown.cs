@@ -5,7 +5,6 @@
         public Unknown(string value)
             : base(value)
         {
-
         }
     }
 }

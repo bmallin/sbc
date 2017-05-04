@@ -2,12 +2,12 @@
 {
     public abstract class Token
     {
-        public string Value { get; }
-
         protected Token(string value)
         {
             Value = value;
         }
+
+        public string Value { get; }
 
         public override string ToString()
         {

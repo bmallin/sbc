@@ -2,11 +2,11 @@
 {
     public abstract class Constant : ExpressionNode
     {
-        public string Value { get; }
-
         protected Constant(string value)
         {
             Value = value;
         }
+
+        public string Value { get; }
     }
 }

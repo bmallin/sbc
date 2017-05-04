@@ -2,11 +2,11 @@
 {
     public class IntegerLiteral : NumberLiteral
     {
-        public int AsInt => int.Parse(Value);
-
         public IntegerLiteral(string value)
             : base(value)
         {
         }
+
+        public int AsInt => int.Parse(Value);
     }
 }

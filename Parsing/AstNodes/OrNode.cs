@@ -2,7 +2,7 @@
 {
     public class OrNode : BinaryOperatorNode
     {
-        public OrNode(ExpressionNode lhs, ExpressionNode rhs) 
+        public OrNode(ExpressionNode lhs, ExpressionNode rhs)
             : base(lhs, rhs)
         {
         }

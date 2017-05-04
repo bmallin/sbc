@@ -5,15 +5,15 @@ namespace Lexing
 {
     public class TokenReader
     {
-        private int _pos;
         private readonly List<Token> _tokens;
-
-        public bool EndOfStream => _pos >= _tokens.Count;
+        private int _pos;
 
         public TokenReader(List<Token> tokens)
         {
             _tokens = tokens;
         }
+
+        public bool EndOfStream => _pos >= _tokens.Count;
 
         public Token Peek()
         {

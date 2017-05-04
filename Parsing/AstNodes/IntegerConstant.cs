@@ -2,11 +2,11 @@
 {
     public class IntegerConstant : Constant
     {
-        public int AsInt => int.Parse(Value);
-
-        public IntegerConstant(string value) 
+        public IntegerConstant(string value)
             : base(value)
         {
         }
+
+        public int AsInt => int.Parse(Value);
     }
 }

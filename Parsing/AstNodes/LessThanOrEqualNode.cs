@@ -2,7 +2,7 @@
 {
     public class LessThanOrEqualNode : BinaryOperatorNode
     {
-        public LessThanOrEqualNode(ExpressionNode lhs, ExpressionNode rhs) 
+        public LessThanOrEqualNode(ExpressionNode lhs, ExpressionNode rhs)
             : base(lhs, rhs)
         {
         }

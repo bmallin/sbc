@@ -2,7 +2,7 @@
 {
     public class MultiplicationNode : BinaryOperatorNode
     {
-        public MultiplicationNode(ExpressionNode lhs, ExpressionNode rhs) 
+        public MultiplicationNode(ExpressionNode lhs, ExpressionNode rhs)
             : base(lhs, rhs)
         {
         }

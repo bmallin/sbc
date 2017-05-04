@@ -2,7 +2,7 @@
 {
     public class AndNode : BinaryOperatorNode
     {
-        public AndNode(ExpressionNode lhs, ExpressionNode rhs) 
+        public AndNode(ExpressionNode lhs, ExpressionNode rhs)
             : base(lhs, rhs)
         {
         }

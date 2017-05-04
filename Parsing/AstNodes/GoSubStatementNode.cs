@@ -2,11 +2,11 @@
 {
     public class GoSubStatementNode : StatementNode
     {
-        public ExpressionNode JumpLocation { get; }
-
         public GoSubStatementNode(ExpressionNode jumpLocation)
         {
             JumpLocation = jumpLocation;
         }
+
+        public ExpressionNode JumpLocation { get; }
     }
 }
